@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+.vite/
+
+# Local env files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# TypeScript incremental state
+*.tsbuildinfo
+node_modules/.tmp/
+
+# Editor and OS metadata
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Test and coverage output
+coverage/
+playwright-report/
+test-results/
+
+# Desktop/mobile wrapper build artifacts
+src-tauri/target/
+gen/
+android/.gradle/
+android/app/build/
+ios/App/build/
+ios/App/Pods/
+ios/App/Podfile.lock
+
+# Local app data and temporary exports
+*.local
+tmp/
+temp/
