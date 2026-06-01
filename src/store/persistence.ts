@@ -1,26 +1,13 @@
-import Dexie, { type Table } from "dexie";
-import type { TodoNode } from "../domain/nodes";
+import { db, LocalBackend } from "../backend/local-backend";
 
-class CascadeTodoDb extends Dexie {
-  nodes!: Table<TodoNode, string>;
+const localBackend = new LocalBackend();
 
-  constructor() {
-    super("cascade-todo");
-    this.version(1).stores({
-      nodes: "id, parentId, order, status, updatedAt",
-    });
-  }
+export { db };
+
+export function loadNodes() {
+  return localBackend.loadNodes();
 }
 
-export const db = new CascadeTodoDb();
-
-export async function loadNodes() {
-  return db.nodes.orderBy("order").toArray();
-}
-
-export async function saveNodes(nodes: TodoNode[]) {
-  await db.transaction("rw", db.nodes, async () => {
-    await db.nodes.clear();
-    await db.nodes.bulkPut(nodes);
-  });
+export function saveNodes(nodes: Parameters<LocalBackend["saveNodes"]>[0]) {
+  return localBackend.saveNodes(nodes);
 }

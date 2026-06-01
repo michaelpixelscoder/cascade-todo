@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { ChevronDown, ChevronsUp, Menu, Plus, Search, X } from "lucide-react";
+import { ChevronDown, ChevronsUp, Menu, Plus, Search, UserRound, X } from "lucide-react";
+import { DebugConsole } from "../components/debug/DebugConsole";
 import { QuickAdd } from "../components/editor/QuickAdd";
+import { BackendSettingsPanel } from "../components/settings/BackendSettingsPanel";
 import { TreeView } from "../components/tree/TreeView";
 import { useTodoStore } from "../store/todo-store";
 
@@ -8,6 +10,7 @@ export function App() {
   const { nodes, hydrate, hydrated, addNode, expandAll, collapseAll } = useTodoStore();
   const [query, setQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const stats = useMemo(() => {
     const done = nodes.filter((node) => node.status === "done").length;
@@ -89,6 +92,14 @@ export function App() {
         >
           <Plus size={25} />
         </button>
+        <button
+          className="icon-button user-button"
+          aria-label="Login and settings"
+          aria-expanded={settingsOpen}
+          onClick={() => setSettingsOpen((open) => !open)}
+        >
+          <UserRound size={21} />
+        </button>
       </header>
 
       {menuOpen && (
@@ -133,6 +144,16 @@ export function App() {
           <TreeView nodes={filteredNodes} isFiltered={Boolean(query.trim())} />
         )}
       </section>
+      {settingsOpen && (
+        <BackendSettingsPanel
+          onClose={() => setSettingsOpen(false)}
+          onSaved={() => {
+            setSettingsOpen(false);
+            void hydrate();
+          }}
+        />
+      )}
+      <DebugConsole />
     </main>
   );
 }

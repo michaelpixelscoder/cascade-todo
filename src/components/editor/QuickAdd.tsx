@@ -8,8 +8,7 @@ export function QuickAdd() {
 
   function submit(event: FormEvent) {
     event.preventDefault();
-    if (!title.trim()) return;
-    addNode(title);
+    addNode(title || "New task");
     setTitle("");
   }
 

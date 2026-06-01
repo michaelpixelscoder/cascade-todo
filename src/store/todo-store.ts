@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { createNode, statusCycle, touch, type NodeStatus, type TodoNode } from "../domain/nodes";
 import { getChildren, isDescendant, nextOrder, normalizeSiblingOrder } from "../domain/tree";
-import { loadNodes, saveNodes } from "./persistence";
+import { getBackend } from "../backend/get-backend";
 import { seedNodes } from "./seed";
 
 type TodoState = {
@@ -28,10 +28,13 @@ type TodoState = {
   addDependency: (id: string, dependencyId: string) => void;
   addDependencies: (id: string, dependencyIds: string[]) => void;
   removeDependency: (id: string, dependencyId: string) => void;
+  replaceAllNodes: (nodes: TodoNode[]) => void;
 };
 
 function persist(nodes: TodoNode[]) {
-  void saveNodes(nodes);
+  void getBackend().saveNodes(nodes).catch((error) => {
+    console.error("Backend save failed", error);
+  });
 }
 
 function replaceNode(nodes: TodoNode[], id: string, updater: (node: TodoNode) => TodoNode) {
@@ -44,13 +47,22 @@ export const useTodoStore = create<TodoState>((set, get) => ({
   hydrated: false,
 
   hydrate: async () => {
-    const stored = await loadNodes();
-    const nodes = (stored.length ? stored : seedNodes).map((node) => ({
-      ...node,
-      type: "task" as const,
-    }));
-    if (!stored.length) await saveNodes(nodes);
-    set({ nodes, hydrated: true });
+    const backend = getBackend();
+    try {
+      const stored = await backend.loadNodes();
+      const nodes = (stored.length ? stored : seedNodes).map((node) => ({
+        ...node,
+        type: "task" as const,
+      }));
+      if (!stored.length) await backend.saveNodes(nodes);
+      set({ nodes, hydrated: true });
+    } catch (error) {
+      console.error("Backend load failed", error);
+      set({
+        nodes: get().nodes.length ? get().nodes : seedNodes.map((node) => ({ ...node, type: "task" as const })),
+        hydrated: true,
+      });
+    }
   },
 
   addNode: (title, parentId = null) => {
@@ -293,5 +305,10 @@ export const useTodoStore = create<TodoState>((set, get) => ({
     );
     persist(nodes);
     set({ nodes });
+  },
+
+  replaceAllNodes: (nodes) => {
+    persist(nodes);
+    set({ nodes, activeNodeId: null, hydrated: true });
   },
 }));

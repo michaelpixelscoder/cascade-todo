@@ -130,7 +130,25 @@ export function TreeNodeRow({ item, nodes, draggingId, onDragStart, onDragEnd, o
           </summary>
           <div className="row-menu-popover">
             <button
-              className="row-delete-button"
+              className="row-menu-button row-menu-edit-button"
+              onClick={() => {
+                onOpenDetails(node.id);
+              }}
+            >
+              <Pencil size={15} />
+              Edit
+            </button>
+            <button
+              className="row-menu-button row-menu-add-button"
+              onClick={() => {
+                addNode("New task", node.id);
+              }}
+            >
+              <Plus size={15} />
+              Add child
+            </button>
+            <button
+              className="row-menu-button row-delete-button"
               onClick={() => {
                 deleteNode(node.id);
               }}

@@ -5,6 +5,7 @@ import { getDependencyState } from "../../domain/cascade";
 import { isDescendant } from "../../domain/tree";
 import { useTodoStore } from "../../store/todo-store";
 import { TaskListItem } from "../task/TaskListItem";
+import { Modal } from "../ui/Modal";
 
 type TaskDetailsModalProps = {
   node: TodoNode;
@@ -78,14 +79,7 @@ export function TaskDetailsModal({ node, nodes, onSelectTask, onClose }: TaskDet
   }
 
   return (
-    <div className="modal-layer" role="presentation" onMouseDown={close}>
-      <section
-        className="task-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Task details"
-        onMouseDown={(event) => event.stopPropagation()}
-      >
+    <Modal open onClose={close} overlayClassName="modal-layer" contentClassName="task-modal" ariaLabel="Task details">
         <div className="modal-main">
           <div className="modal-header">
             <span>Task details</span>
@@ -221,15 +215,15 @@ export function TaskDetailsModal({ node, nodes, onSelectTask, onClose }: TaskDet
             <p className="empty-inline">No tasks depend on this one.</p>
           )}
         </aside>
-      </section>
+
 
       {dependencyPickerOpen && (
-        <section
-          className="dependency-picker"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Add dependencies"
-          onMouseDown={(event) => event.stopPropagation()}
+        <Modal
+          open
+          onClose={() => setDependencyPickerOpen(false)}
+          overlayClassName="modal-layer dependency-picker-layer"
+          contentClassName="dependency-picker"
+          ariaLabel="Add dependencies"
         >
           <div className="dependency-picker-header">
             <h2>Add dependencies</h2>
@@ -263,8 +257,8 @@ export function TaskDetailsModal({ node, nodes, onSelectTask, onClose }: TaskDet
               Add selected
             </button>
           </div>
-        </section>
+        </Modal>
       )}
-    </div>
+    </Modal>
   );
 }
